@@ -10,5 +10,5 @@ Reloj con horas minutos y segundos, desarrollado con ESP8266, 3 OLED SSD1306, RT
 ## Principales características
 - En cada uno de los OLED se muestra la hora, minutos y segundos respectivamente
 - Hora obtenida por el RTC
-- Sincronización NTP
+- Actualización NTP asíncrona
 - Zona horaria y horario de invierno / verano
