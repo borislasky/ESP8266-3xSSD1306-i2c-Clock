@@ -1,0 +1,2 @@
+El directorio fonts hay que dejarlo limpio.  
+Es decir, dejar solo la font que utilizaré
