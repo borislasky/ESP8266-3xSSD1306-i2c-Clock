@@ -5,31 +5,7 @@
 
    Comienzo junio 2019
 
-   Tiene dos partes de visualización:
-   - Hora
-   - Otra información
-
-   Qué hace
-   - Se conecta a la wifi
-   - Se conecta a un servidor NTP
-   - Se conecta a un broker MQTT que le dirá qué info complementaria ofrece:
-      - 00. Fecha. Default. Seteo al principio y actualizaré a las 00:00:00
-      - 01. Temperatura actual, máxima y mínima
-      - 02. Humedad
-      - 03. Presión
-      - 04. Estado del cielo
-      - 05. Viento: velocidad y dirección
-      - timestamp. Con esto compruebo si los datos meteos que tengo son viejos
-        o no
-
-      Los mensajes MQTT vendrán siempre todos. Como los publico con retained,
-      los tendré siempre. Cuando quiera visualizar alguno, si es viejo,
-      pediré al node-red que los actualice y me llegarán via MQTT.
-
-      Vuelvo a default pasado un tiempo
-
-   - Un pulsador irá cambiando la función a visulaizar. También vuelve a
-   default.
+   
 */
 
 /*
@@ -40,8 +16,6 @@
 */
 
 #include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-#include <Ticker.h>
 #include <NtpClientLib.h>
 #include <Timezone.h>
 #include "libraries/OLED.h"
@@ -59,28 +33,6 @@ bool WiFiPrimeraConexion = false;
 
 
 //------------------------------------------------------------------------------
-// MQTT
-//------------------------------------------------------------------------------
-PubSubClient MQTTclient(InternetClient);
-//IPAddress    MQTT_SERVER_IP;
-#define MQTT_SERVER     "192.168.43.212"
-#define MQTT_PORT       1883
-#define MQTT_USER       "pi"
-#define MQTT_PASSWORD   "picom222"
-#define MQTT_IN_FUNCION "/torredembarra/reloj/0/funcion/set"
-#define MQTT_IN_DATOS   "/torredembarra/DatosMeteo/#"
-#define MQTT_CLIENT_ID  "ESP-00-/torredembarra/reloj/0/funcion/"
-/*
-  const char*  MQTT_SERVER     = "192.168.43.212";
-  const int    MQTT_PORT       = 1883;
-  const char*  MQTT_USER       = "pi";
-  const char*  MQTT_PASSWORD   = "picom222";
-  const char*  MQTT_IN_FUNCION = "/torredembarra/reloj/0/funcion/set";
-  const char*  MQTT_IN_DATOS   = "/torredembarra/DatosMeteo/#";
-  const char*  MQTT_CLIENT_ID  = "ESP-00-/torredembarra/reloj/0/funcion/";
-*/
-
-//------------------------------------------------------------------------------
 // NTP
 //------------------------------------------------------------------------------
 //#define NTP_ADDRESS  "192.168.43.200"  // URL NTP laskyserver
@@ -88,10 +40,8 @@ PubSubClient MQTTclient(InternetClient);
 //#define NTP_ADDRESS  "poll.ntp.org"  // URL NTP
 //#define NTP_ADDRESS  "laskyserver.ddns.net"  // URL NTP
 #define NTP_ADDRESS  "192.168.43.202"  // URL NTP lasky
-#define NTP_OFFSET   0
-// En horas. Teóricamente el offset lo setea
-// timezone.h
-// Habrá que esperar al cambio de hora de invierno 2019
+#define NTP_OFFSET   0  // En horas. Teóricamente el offset lo setea timezone.h
+		// Habrá que esperar al cambio de hora de invierno 2019
 bool syncEventTriggered = false; // True if a time even has been triggered
 NTPSyncEvent_t ntpEvent; // Last triggered event
 
@@ -120,44 +70,6 @@ PCF8563_TCA9548A rtc(MUX_Address, CANAL_RTC);
 //------------------------------------------------------------------------------
 #define CANAL_OLED_1 1
 OLED segundos(MUX_Address, CANAL_OLED_1, 128, 32);
-
-
-//------------------------------------------------------------------------------
-// Ticker para activar la vuelta a default
-//------------------------------------------------------------------------------
-Ticker VuelveDefaultT;
-#define VuelveDefault 15  // 15 segundos
-
-
-//------------------------------------------------------------------------------
-// Variables globales para visualización
-//------------------------------------------------------------------------------
-#define SHOW_TIME_PERIOD 1000
-const char * dias[]  = {"Domingo", "Lunes", "Martes", "Miercoles",
-                        "Jueves", "Viernes", "Sabado"
-                       } ;
-const char * meses[] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun",
-                        "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
-                       } ;
-
-//------------------------------------------------------------------------------
-// Variables globales de estado
-//------------------------------------------------------------------------------
-#define viejo           15 * 60 // >15 minutos lo considero viejo
-#define TotalFunciones  6
-int     Funcion = 0; // qué tengo que visualizar en el panel de información
-String  FechaHora, detalle, tempExt, tempInt, humedadExt, humedadInt,
-        viento, amanecer, anochecer;
-unsigned int timestamp = 0; // guarda el timestamp de cuando recibo datos
-unsigned int PendPintarSalida = false;
-// Lo utilizo cuando tengo datos viejos y
-// estoy pendiente de recibir nuevos
-
-//------------------------------------------------------------------------------
-// Pulsador cambio de función
-//------------------------------------------------------------------------------
-const int pulsador = 2; // D4
-volatile int EstaPulsado = 0;
 
 
 // Handlers de wifi conectada e IP asignada
