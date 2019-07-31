@@ -12,3 +12,5 @@ Reloj con horas minutos y segundos, desarrollado con ESP8266, 3 OLED SSD1306, RT
 - Hora obtenida por el RTC
 - Actualización NTP asíncrona
 - Zona horaria y horario de invierno / verano
+  
+## [Esquema eléctrico](https://github.com/borislasky/ESP8266-3xSSD1306-i2c-Clock/blob/develop/schemes/Schematic_Reloj_Esquema(provisional).pdf)
