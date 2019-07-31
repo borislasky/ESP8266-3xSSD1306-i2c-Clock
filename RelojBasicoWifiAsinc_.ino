@@ -44,8 +44,8 @@
 #include <Ticker.h>
 #include <NtpClientLib.h>
 #include <Timezone.h>
-#include <OLED.h>
-#include <PCF8563_TCA9548A.h>
+#include "libraries/OLED.h"
+#include "libraries/CF8563_TCA9548A.h"
 
 //------------------------------------------------------------------------------
 // WiFi
