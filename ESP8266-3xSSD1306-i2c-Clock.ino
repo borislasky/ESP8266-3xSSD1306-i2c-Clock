@@ -18,8 +18,8 @@
 #include <ESP8266WiFi.h>
 #include <NtpClientLib.h>
 #include <Timezone.h>
-#include "libraries/OLED.h"
-#include "libraries/CF8563_TCA9548A.h"
+#include <OLED.h>
+#include <PCF8563_TCA9548A.h>
 
 //------------------------------------------------------------------------------
 // WiFi
@@ -71,6 +71,7 @@ PCF8563_TCA9548A rtc(MUX_Address, CANAL_RTC);
 #define CANAL_OLED_1 1
 OLED segundos(MUX_Address, CANAL_OLED_1, 128, 32);
 
+#define SHOW_TIME_PERIOD 100
 
 // Handlers de wifi conectada e IP asignada
 void HandlerWifiConectada(WiFiEventStationModeConnected ipInfo) {
